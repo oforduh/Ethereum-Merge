@@ -38,10 +38,12 @@ const HomePage = () => {
   };
   return (
     <div>
-      <button onClick={transferEth}>
-        {" "}
-        {processing ? "Merging" : "Merge to Pos"}
-      </button>
+      {connected && (
+        <button onClick={transferEth}>
+          {" "}
+          {processing ? "Merging" : "Ethereum Merge"}
+        </button>
+      )}
       {connected && <div>{formatedBalanceData(balance)}ETH</div>}
     </div>
   );
