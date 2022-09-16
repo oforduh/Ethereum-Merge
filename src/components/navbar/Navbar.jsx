@@ -1,14 +1,10 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import styles from "./navbar.module.scss";
-import WalletConnectProvider from "@walletconnect/web3-provider";
-import Web3Modal from "web3modal";
-import { StaticJsonRpcProvider, Web3Provider } from "@ethersproject/providers";
-import { EnvHelper } from "../../helper/Environment";
 import CoinbaseWalletSDK from "@coinbase/wallet-sdk";
-import { toast } from "react-toastify";
 import { useAddress, useWeb3Context } from "../../context/web3Context";
 
 const Navbar = () => {
+  const [connecting, setConnecting] = useState(false);
   const address = useAddress();
   const { connect, disconnect, connected } = useWeb3Context();
 
@@ -26,11 +22,15 @@ const Navbar = () => {
           <button
             onClick={() => {
               {
-                !connected ? connect() : disconnect();
+                !connected ? connect(setConnecting) : disconnect();
               }
             }}
           >
-            {connected ? ellipsis : "connect wallet"}
+            {connected
+              ? ellipsis
+              : connecting
+              ? "connecting"
+              : "connect wallet"}
           </button>
         </div>
       </div>
