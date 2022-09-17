@@ -22,15 +22,11 @@ const Navbar = () => {
           <button
             onClick={() => {
               {
-                !connected ? connect(setConnecting) : disconnect();
+                !connected ? connect() : disconnect();
               }
             }}
           >
-            {connected
-              ? ellipsis
-              : connecting
-              ? "connecting"
-              : "connect wallet"}
+            {connected ? ellipsis : "connect wallet"}
           </button>
         </div>
       </div>

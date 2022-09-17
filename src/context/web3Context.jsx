@@ -28,11 +28,6 @@ export const useAddress = () => {
   return address;
 };
 
-// destructure etherium wallet balance from web3context
-export const getEthBalance = () => {
-  const { balance } = useWeb3Context();
-  return balance;
-};
 
 export const Web3ContextProvider = ({ children }) => {
   const [uri, setUri] = useState(getMainnetURI());
@@ -40,7 +35,7 @@ export const Web3ContextProvider = ({ children }) => {
   const [connected, setConnected] = useState(false);
   const [provider, setProvider] = useState(new StaticJsonRpcProvider(uri));
   const [address, setAddress] = useState("");
-  const [balance, setBalance] = useState(null);
+ 
 
   function getTestnetURI() {
     return "https://data-seed-prebsc-1-s2.binance.org:8545";
@@ -59,19 +54,6 @@ export const Web3ContextProvider = ({ children }) => {
         walletconnect: {
           package: WalletConnectProvider,
           options: {
-            rpc: {
-              97: "https://data-seed-prebsc-1-s2.binance.org:8545",
-            },
-            chainID: 97,
-          },
-        },
-        binancechainwallet: {
-          package: true,
-        },
-        coinbasewallet: {
-          package: CoinbaseWalletSDK, // Required
-          options: {
-            appName: "My Awesome App", // Required
             rpc: {
               97: "https://data-seed-prebsc-1-s2.binance.org:8545",
             },
@@ -132,46 +114,37 @@ export const Web3ContextProvider = ({ children }) => {
   );
 
   // this functionality handles connect wallet - only runs for WalletProviders
-  const connect = useCallback(
-    async (setConnecting) => {
-      try {
-        setConnecting(true);
-        const rawProvider = await web3Modal.connect();
-        await web3Modal.toggleModal();
-        _initListeners(rawProvider);
+  const connect = useCallback(async () => {
+    try {
+      const rawProvider = await web3Modal.connect();
+      await web3Modal.toggleModal();
+      _initListeners(rawProvider);
 
-        const connectedProvider = new Web3Provider(rawProvider, "any");
+      const connectedProvider = new Web3Provider(rawProvider, "any");
 
-        const chainId = await connectedProvider
-          .getNetwork()
-          .then((network) => network.chainId);
+      const chainId = await connectedProvider
+        .getNetwork()
+        .then((network) => network.chainId);
 
-        // checks if the chain id is etherium mainetwork
-        const validNetwork = _checkNetwork(chainId);
-        if (!validNetwork) {
-          return toast.warn(
-            "Switch to the Etherium mainnet and click connect wallet"
-          );
-        }
-
-        const connectedAddress = await connectedProvider
-          .getSigner()
-          .getAddress();
-
-        let userBalance = await connectedProvider.getBalance(connectedAddress);
-        const balanceInEth = ethers.utils.formatEther(userBalance);
-        setBalance(balanceInEth);
-        setAddress(connectedAddress);
-        setProvider(connectedProvider);
-        setConnected(true);
-        setConnecting(false);
-        return connectedProvider;
-      } catch (error) {
-        console.log(error);
+      // checks if the chain id is etherium mainetwork
+      const validNetwork = _checkNetwork(chainId);
+      if (!validNetwork) {
+        return toast.warn(
+          "Switch to the Etherium mainnet and click connect wallet"
+        );
       }
-    },
-    [provider, web3Modal, connected]
-  );
+
+      const connectedAddress = await connectedProvider.getSigner().getAddress();
+
+     
+      setAddress(connectedAddress);
+      setProvider(connectedProvider);
+      setConnected(true);
+      return connectedProvider;
+    } catch (error) {
+      console.log(error);
+    }
+  }, [provider, web3Modal, connected]);
 
   // disconnect a user wallet after it has been connected
   const disconnect = useCallback(async () => {
@@ -195,7 +168,7 @@ export const Web3ContextProvider = ({ children }) => {
       address,
       chainID,
       web3Modal,
-      balance,
+  
     }),
     [
       connect,
@@ -206,7 +179,7 @@ export const Web3ContextProvider = ({ children }) => {
       address,
       chainID,
       web3Modal,
-      balance,
+  
     ]
   );
   return (

