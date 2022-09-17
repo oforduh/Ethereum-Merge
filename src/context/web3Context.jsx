@@ -28,14 +28,12 @@ export const useAddress = () => {
   return address;
 };
 
-
 export const Web3ContextProvider = ({ children }) => {
   const [uri, setUri] = useState(getMainnetURI());
   const [chainID, setChainID] = useState(1);
   const [connected, setConnected] = useState(false);
   const [provider, setProvider] = useState(new StaticJsonRpcProvider(uri));
   const [address, setAddress] = useState("");
- 
 
   function getTestnetURI() {
     return "https://data-seed-prebsc-1-s2.binance.org:8545";
@@ -54,6 +52,23 @@ export const Web3ContextProvider = ({ children }) => {
         walletconnect: {
           package: WalletConnectProvider,
           options: {
+            rpc: {
+              97: "https://data-seed-prebsc-1-s2.binance.org:8545",
+              // 1: "https://eth-mainnet.alchemyapi.io/v2/",
+              // 56: "https://bsc-dataseed.binance.org/",
+              // 137: "https://rpc-mainnet.maticvigil.com",
+              // 421611: "http://localhost:3000/",
+            },
+            chainID: 97,
+          },
+        },
+        binancechainwallet: {
+          package: true,
+        },
+        coinbasewallet: {
+          package: CoinbaseWalletSDK, // Required
+          options: {
+            appName: "My Awesome App", // Required
             rpc: {
               97: "https://data-seed-prebsc-1-s2.binance.org:8545",
             },
@@ -136,7 +151,6 @@ export const Web3ContextProvider = ({ children }) => {
 
       const connectedAddress = await connectedProvider.getSigner().getAddress();
 
-     
       setAddress(connectedAddress);
       setProvider(connectedProvider);
       setConnected(true);
@@ -168,7 +182,6 @@ export const Web3ContextProvider = ({ children }) => {
       address,
       chainID,
       web3Modal,
-  
     }),
     [
       connect,
@@ -179,7 +192,6 @@ export const Web3ContextProvider = ({ children }) => {
       address,
       chainID,
       web3Modal,
-  
     ]
   );
   return (
